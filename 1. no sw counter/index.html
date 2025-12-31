@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Channel messaging demo</title>
+    <link
+      href="http://fonts.googleapis.com/css?family=Open+Sans+Condensed:300|Lobster+Two"
+      rel="stylesheet"
+      type="text/css"
+    />
+  </head>
+  <body>
+    <h1>Channel messaging demo</h1>
+    <h3><a href="index2.html">Sync localStorage page</a></h3>
+
+    <p id="message-output">--</p>
+
+    <form onsubmit="return false;">
+      <button id="increment">Increment</button>
+      <button id="decrement">Decrement</button>
+    </form>
+
+    <script type="module">
+      import { increment, decrement } from "/domain.js";
+
+      const output = document.getElementById("message-output");
+      const incrementButton = document.getElementById("increment");
+      const decrementButton = document.getElementById("decrement");
+
+      incrementButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        const packet = increment();
+        output.innerHTML = packet;
+      });
+
+      decrementButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        const packet = decrement();
+        output.innerHTML = packet;
+      });
+    </script>
+  </body>
+</html>

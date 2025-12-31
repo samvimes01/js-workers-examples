@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Channel messaging demo</title>
+    <link
+      href="http://fonts.googleapis.com/css?family=Open+Sans+Condensed:300|Lobster+Two"
+      rel="stylesheet"
+      type="text/css"
+    />
+  </head>
+  <body>
+    <h1>Channel messaging demo</h1>
+    <div style="display: flex; gap: 3rem">
+      <div>
+        <h2>Counter</h2>
+        <p id="message-output">--</p>
+
+        <form onsubmit="return false;">
+          <button id="increment">Increment</button>
+          <button id="decrement">Decrement</button>
+        </form>
+      </div>
+      <div>
+        <h2>Counter Service Worker</h2>
+        <p id="message-output-sw">--</p>
+
+        <form onsubmit="return false;">
+          <button id="increment-sw">Increment</button>
+          <button id="decrement-sw">Decrement</button>
+        </form>
+      </div>
+    </div>
+
+    <script type="module">
+      import { increment, decrement } from "/domain.js";
+
+      const output = document.getElementById("message-output");
+      const incrementButton = document.getElementById("increment");
+      const decrementButton = document.getElementById("decrement");
+
+      incrementButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        const val = increment();
+        output.innerHTML = val;
+      });
+
+      decrementButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        const val = decrement();
+        output.innerHTML = val;
+      });
+
+      /**
+       * Service Worker logic
+       */
+      const outputSW = document.getElementById("message-output-sw");
+      const incrementSWButton = document.getElementById("increment-sw");
+      const decrementSWButton = document.getElementById("decrement-sw");
+
+      const sw = navigator.serviceWorker;
+      // multiple service workers registration is allowed if scope is different
+      sw.register("/another/another-sw.js", { scope: "/another/" });
+      sw.register("/sw.js");
+
+      const registration = await sw.ready;
+      const worker = registration.active;
+
+      const broadcastChannel = new BroadcastChannel("counter");
+
+      broadcastChannel.postMessage({
+        type: "INIT",
+      });
+
+      incrementSWButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        broadcastChannel.postMessage({
+          type: "INCREMENT",
+        });
+      });
+
+      decrementSWButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        broadcastChannel.postMessage({
+          type: "DECREMENT",
+        });
+      });
+
+      broadcastChannel.onmessage = ({ data }) => {
+        if (data.type === "RESULT") {
+          console.log("Main from broadcast channel received: ", data.type);
+          outputSW.innerHTML = data.payload;
+        }
+      };
+
+      sw.addEventListener("message", (event) => {
+        const { type, data } = event.data;
+        console.log("Main from SW received: ", type, data);
+      });
+    </script>
+  </body>
+</html>

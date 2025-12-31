@@ -1,0 +1,26 @@
+{
+  "name": "swiife",
+  "version": "1.0.0",
+  "author": "Oleksandr Korneiko <oleksandr.korneiko@gmail.com>",
+  "description": "",
+  "main": "server.mjs",
+  "type": "module",
+  "scripts": {
+    "build": "metarhia-build && ln -sf ../node_modules/metacom/metacom-service-worker.js 6.\\ metacom",
+    "start": "node server.mjs"
+  },
+  "keywords": [
+    "service worker",
+    "broadcast channel",
+    "message channel",
+    "shared worker"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "metacom": "file:.yalc/metacom",
+    "metautil": "file:.yalc/metautil"
+  },
+  "devDependencies": {
+    "metarhia-build": "file:.yalc/metarhia-build"
+  }
+}

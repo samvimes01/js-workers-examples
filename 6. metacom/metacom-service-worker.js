@@ -1,0 +1,1 @@
+../node_modules/metacom/metacom-service-worker.js

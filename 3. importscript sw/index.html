@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Channel messaging demo</title>
+    <link
+      href="http://fonts.googleapis.com/css?family=Open+Sans+Condensed:300|Lobster+Two"
+      rel="stylesheet"
+      type="text/css"
+    />
+  </head>
+  <body>
+    <h1>Channel messaging demo</h1>
+    <div style="display: flex; gap: 3rem">
+      <div>
+        <h2>Counter</h2>
+        <p id="message-output">--</p>
+
+        <form onsubmit="return false;">
+          <button id="increment">Increment</button>
+          <button id="decrement">Decrement</button>
+        </form>
+      </div>
+      <div>
+        <h2>Counter Service Worker</h2>
+        <p id="message-output-sw">--</p>
+
+        <form onsubmit="return false;">
+          <button id="increment-sw">Increment</button>
+          <button id="decrement-sw">Decrement</button>
+        </form>
+      </div>
+    </div>
+
+    <script type="module">
+      import { increment, decrement } from "/domain.js";
+
+      const output = document.getElementById("message-output");
+      const incrementButton = document.getElementById("increment");
+      const decrementButton = document.getElementById("decrement");
+
+      incrementButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        const val = increment();
+        output.innerHTML = val;
+      });
+
+      decrementButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        const val = decrement();
+        output.innerHTML = val;
+      });
+
+      /**
+       * Service Worker logic
+       */
+      const outputSW = document.getElementById("message-output-sw");
+      const incrementSWButton = document.getElementById("increment-sw");
+      const decrementSWButton = document.getElementById("decrement-sw");
+
+      const sw = navigator.serviceWorker;
+      sw.register("/sw.js");
+      const registration = await sw.ready;
+      const worker = registration.active;
+
+      const messageChannel = new MessageChannel();
+      const messagePort = messageChannel.port1;
+
+      worker.postMessage(
+        {
+          type: "INIT",
+        },
+        [messageChannel.port2]
+      );
+
+      incrementSWButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        messagePort.postMessage({
+          type: "INCREMENT",
+        });
+      });
+
+      decrementSWButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        messagePort.postMessage({
+          type: "DECREMENT",
+        });
+      });
+
+      messagePort.onmessage = ({ data }) => {
+        console.log("Main: Port received", data.type);
+
+        if (data.type === "RESULT") {
+          outputSW.innerHTML = data.payload;
+        }
+      };
+    </script>
+  </body>
+</html>

@@ -1,0 +1,5 @@
+{
+  "mode": "app",
+  "appStaticDir": "6. metacom",
+  "order": ["metacom", "metautil"]
+}
