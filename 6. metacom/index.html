@@ -17,7 +17,9 @@
     <p id="message-output">Message not yet sent</p>
 
     <form>
-      <button>Get counter</button>
+      <button id="get-counter" type="button">Get counter</button>
+      <button id="upload-file" type="button">Upload file</button>
+      <button id="download-file" type="button">Download file</button>
     </form>
     <script type="importmap">
       {
@@ -27,9 +29,11 @@
       }
     </script>
     <script type="module">
-      const output = document.getElementById("message-output");
-      const button = document.querySelector("button");
-      const authStatus = document.getElementById("auth-status");
+      const output = document.querySelector("#message-output");
+      const getCounterButton = document.querySelector("#get-counter");
+      const authStatus = document.querySelector("#auth-status");
+      const uploadFileButton = document.querySelector("#upload-file");
+      const downloadFileButton = document.querySelector("#download-file");
 
       import { Metacom } from "/metacom.mjs";
 
@@ -37,9 +41,17 @@
       sw.register("/metacom-service-worker.js");
       try {
         const url = "ws://localhost:8002/api";
-        const metacom = await Metacom.createProxy(url, {
+
+        const metacomSW = await Metacom.createProxy(url, {
           metacomLoad: ["auth", "console", "example", "files"],
         });
+        const metacom = metacomSW;
+
+        // // Uncomment to use in main thread
+        // const metacomMT = Metacom.create(url);
+        // await metacomMT.load("auth", "console", "example", "files");
+        // const metacom = metacomMT;
+
         const api = metacom.api;
 
         const token = localStorage.getItem("metarhia.session.token");
@@ -61,11 +73,33 @@
           }
         }
 
-        button.addEventListener("click", async (e) => {
+        getCounterButton.addEventListener("click", async (e) => {
           e.preventDefault();
-          const packet = await metacom.api.example.counter();
+          const packet = await api.example.counter();
           output.innerHTML = packet.result;
         });
+
+        const onUpload = (e) => {
+          e.preventDefault();
+          const inp = document.createElement("input");
+          inp.type = "file";
+          inp.addEventListener("change", async (evt) => {
+            const file = evt.target.files[0];
+            inp.remove();
+            if (!file) return;
+            const res = await metacom.uploadFile(file);
+            console.log("File Uploaded: ", res);
+          });
+          inp.click();
+        };
+        const onDownload = async (e) => {
+          e.preventDefault();
+          const res = await metacom.downloadFile("hello.json");
+          console.log("File Downloaded: ", res);
+        };
+
+        uploadFileButton.addEventListener("click", onUpload);
+        downloadFileButton.addEventListener("click", onDownload);
 
         function updateAuthStatus() {
           setTimeout(() => {

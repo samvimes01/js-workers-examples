@@ -7,7 +7,8 @@
   "type": "module",
   "scripts": {
     "build": "metarhia-build && ln -sf ../node_modules/metacom/metacom-service-worker.js 6.\\ metacom",
-    "start": "node server.mjs"
+    "start": "node server.mjs",
+    "deps": "./load_deps.sh"
   },
   "keywords": [
     "service worker",

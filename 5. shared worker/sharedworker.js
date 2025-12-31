@@ -1,4 +1,8 @@
+// both static import and importScripts are valid in all browsers
 import { decrement, getCounter, increment } from "./domain.js";
+
+// importScripts("./domain-sw.js");
+// const { decrement, getCounter, increment } = domainIIFE;
 
 const TYPES = ["INCREMENT", "DECREMENT"];
 const OPS = {
