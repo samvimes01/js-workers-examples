@@ -32,7 +32,7 @@ echo "cloned, built and yalc published metarhia-build"
 
 # Clone and setup metautil
 cd vendor
-git clone -b build git@github.com:metarhia/metautil.git
+git clone -b iife_build git@github.com:samvimes01/metautil.git
 cd metautil
 yalc add -D metarhia-build
 npm install
