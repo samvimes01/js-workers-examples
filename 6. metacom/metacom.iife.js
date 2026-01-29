@@ -1,1 +1,0 @@
-../node_modules/metacom/metacom.iife.js

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -21,13 +21,6 @@
       <button id="upload-file" type="button">Upload file</button>
       <button id="download-file" type="button">Download file</button>
     </form>
-    <script type="importmap">
-      {
-        "imports": {
-          "metautil": "/metautil.mjs"
-        }
-      }
-    </script>
     <script type="module">
       const output = document.querySelector("#message-output");
       const getCounterButton = document.querySelector("#get-counter");
@@ -35,11 +28,11 @@
       const uploadFileButton = document.querySelector("#upload-file");
       const downloadFileButton = document.querySelector("#download-file");
 
-      import { Metacom } from "/metacom.mjs";
+      import { Metacom } from "/metacom.js";
 
       const sw = navigator.serviceWorker;
-      sw.register("/metacom-service-worker.js");
       try {
+        await sw.register("/metacom-service-worker.js", { type: "module" });
         const url = "ws://localhost:8002/api";
 
         const metacomSW = await Metacom.createProxy(url, {
